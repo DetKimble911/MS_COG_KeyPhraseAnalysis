@@ -36,7 +36,8 @@ namespace ConsoleApp1
 
 
             // Getting key-phrases
-            Console.WriteLine("===== KEY-PHRASE EXTRACTION ======");
+            Console.WriteLine("===== MS_CA_TEXT_ANALYSIS ======");
+            Console.WriteLine("==== KEY PHRASE & SENTIMENT ====");
             Console.WriteLine("Type 'quit' to exit application");
 
             string text;
@@ -46,24 +47,38 @@ namespace ConsoleApp1
                 Console.WriteLine("\nText to Analyze:");
                 text = Console.ReadLine();
 
+                //** GATHER **
+                //Key Phrase(s)
                 KeyPhraseBatchResult result2 = client.KeyPhrasesAsync(new MultiLanguageBatchInput(
                             new List<MultiLanguageInput>()
                             {
                           new MultiLanguageInput("en", "3", text),
                             })).Result;
 
-                // Printing keyphrases
+                //Sentiment
+                SentimentBatchResult result3 = client.SentimentAsync(new MultiLanguageBatchInput(
+                            new List<MultiLanguageInput>()
+                            {
+                          new MultiLanguageInput("en", "3", text),
+                            })).Result;
+
+                //** PRINT **
+                //Key Phrase(s)
+                foreach (var document in result3.Documents)
+                {
+                    Console.WriteLine("\n Sentiment: ");
+                    Console.WriteLine("\t " + Math.Round(document.Score.Value, 3, MidpointRounding.AwayFromZero));
+                }
+
+                //Sentiment
                 foreach (var document in result2.Documents)
                 {
-                    Console.WriteLine("\n Key phrases:");
-
-                    foreach (string keyphrase in document.KeyPhrases)
-                    {
+                     Console.WriteLine("\n Key Phrases:");
+                     foreach (string keyphrase in document.KeyPhrases)
+                     {
                         Console.WriteLine("\t " + keyphrase);
-                    }
-
-                    Console.WriteLine("\n===End of Result===");
-                }
+                     }
+                } 
 
             } while (text != "quit");
         }
