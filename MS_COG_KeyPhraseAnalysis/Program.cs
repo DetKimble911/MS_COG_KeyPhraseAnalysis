@@ -72,7 +72,7 @@ namespace ConsoleApp1
                     Console.WriteLine("\t " + Math.Round(document.Score.Value, 3, MidpointRounding.AwayFromZero));
                 }
 
-                //Key Phrase(s) S
+                //Key Phrase(s)
                 foreach (var document in result_k.Documents)
                 {
                      Console.WriteLine("\n Key Phrases:");
