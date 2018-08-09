@@ -11,9 +11,6 @@ namespace ConsoleApp1
 {
     class Program
     {
-        /// <summary>
-        /// Container for subscription credentials. Make sure to enter your valid key.
-        /// </summary>
         class ApiKeyServiceClientCredentials : ServiceClientCredentials
         {
             public override Task ProcessHttpRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -34,8 +31,6 @@ namespace ConsoleApp1
 
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-
-            // Getting key-phrases
             Console.WriteLine("===== MS_CA_TEXT_ANALYSIS ======");
             Console.WriteLine("==== KEY PHRASE & SENTIMENT ====");
             Console.WriteLine("Type 'quit' to exit application");
@@ -47,38 +42,55 @@ namespace ConsoleApp1
                 Console.WriteLine("\nText to Analyze:");
                 text = Console.ReadLine();
 
-                //** GATHER **
+               //** GATHER (POST)
                 //Key Phrase(s)
-                KeyPhraseBatchResult result2 = client.KeyPhrasesAsync(new MultiLanguageBatchInput(
+                KeyPhraseBatchResult result_k = client.KeyPhrasesAsync(new MultiLanguageBatchInput(
                             new List<MultiLanguageInput>()
                             {
                           new MultiLanguageInput("en", "3", text),
                             })).Result;
 
                 //Sentiment
-                SentimentBatchResult result3 = client.SentimentAsync(new MultiLanguageBatchInput(
+                SentimentBatchResult result_s = client.SentimentAsync(new MultiLanguageBatchInput(
                             new List<MultiLanguageInput>()
                             {
                           new MultiLanguageInput("en", "3", text),
                             })).Result;
 
-                //** PRINT **
-                //Key Phrase(s)
-                foreach (var document in result3.Documents)
+                //Entities
+                EntitiesBatchResult result_e = client.EntitiesAsync(new MultiLanguageBatchInput(
+                            new List<MultiLanguageInput>()
+                            {
+                          new MultiLanguageInput("en", "3", text),
+                            })).Result;
+
+               //** PRINT (RESPONSE)
+                //Sentiment
+                foreach (var document in result_s.Documents)
                 {
                     Console.WriteLine("\n Sentiment: ");
                     Console.WriteLine("\t " + Math.Round(document.Score.Value, 3, MidpointRounding.AwayFromZero));
                 }
 
-                //Sentiment
-                foreach (var document in result2.Documents)
+                //Key Phrase(s)
+                foreach (var document in result_k.Documents)
                 {
                      Console.WriteLine("\n Key Phrases:");
                      foreach (string keyphrase in document.KeyPhrases)
                      {
                         Console.WriteLine("\t " + keyphrase);
                      }
-                } 
+                }
+
+                //Entities
+                foreach (var document in result_e.Documents)
+                {
+                    Console.WriteLine("\n Entities:");
+                    foreach (var entity in document.Entities)
+                    {
+                        Console.WriteLine("\t " + entity.Name + " (" + entity.WikipediaUrl + ")" );
+                    }
+                }
 
             } while (text != "quit");
         }
